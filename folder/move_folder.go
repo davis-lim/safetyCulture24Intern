@@ -50,9 +50,11 @@ func (f *driver) MoveFolder(name string, dst string) ([]Folder, error) {
 
 	//Check for source path and update all of its descendants
 	for i := range f.folders {
+		fmt.Printf("Checking folder at index %d with path %s\n", i, f.folders[i].Paths)
 		if strings.HasPrefix(f.folders[i].Paths, originalPath) {
 			f.folders[i].Paths = strings.Replace(f.folders[i].Paths, originalPath, newPath, 1)
 		} else {
+			// print statement for debugging
 			fmt.Printf("Prefix condition failed for folder at index %d\n", i)
 		}
 	}

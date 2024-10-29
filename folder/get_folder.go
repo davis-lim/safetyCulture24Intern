@@ -40,7 +40,19 @@ func (f *driver) GetAllChildFolders(orgID uuid.UUID, name string) ([]Folder, err
 
 	// Check for valid orgID
 	if !f.OrgIdValid(orgID) {
-		return nil, errors.New("orgID does not exist")
+		return nil, errors.New("error: orgID does not contain any folders")
+	}
+
+	// Check if folder exists
+	var isFolder *Folder
+	for i, folder := range f.folders {
+		if folder.Name == name {
+			isFolder = &f.folders[i]
+		} 
+	}
+
+	if isFolder == nil {
+		return nil, errors.New("error: Folder does not exist")
 	}
 
 	// Get all folders from orgID
@@ -50,7 +62,7 @@ func (f *driver) GetAllChildFolders(orgID uuid.UUID, name string) ([]Folder, err
 	folderExists := false
 	var rootPath string
 	
-	// Check if root folder exists within currOrgFolders by matching last segment of each path
+	// Check if folder exists within currOrgFolders by matching last segment of each path
 	for _, folder:= range currOrgFolders {
 		segments := strings.Split(folder.Paths, ".")
 		
@@ -65,7 +77,7 @@ func (f *driver) GetAllChildFolders(orgID uuid.UUID, name string) ([]Folder, err
 	
 	// Error checking for invalid path
 	if !folderExists {
-		return nil, errors.New("given name folder does not exist")
+		return nil, errors.New("error: Folder does not exist in the specified organization")
 	}
 	
 	//Create a prefix that all child folders should contain
