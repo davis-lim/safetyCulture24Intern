@@ -10,19 +10,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// Sample data for testing
-var sampleFolders = []folder.Folder{
-	{Name: "alpha", Paths: "alpha", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-	{Name: "bravo", Paths: "alpha.bravo", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-	{Name: "charlie", Paths: "alpha.bravo.charlie", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-	{Name: "delta", Paths: "alpha.delta", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-	{Name: "echo", Paths: "echo", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-	{Name: "foxtrot", Paths: "foxtrot", OrgId: uuid.Must(uuid.FromString("22222222-2222-2222-2222-222222222222"))},
+// Returns Sample Folders
+func GetSampleFolders() []folder.Folder {
+	return []folder.Folder {
+		{Name: "alpha", Paths: "alpha", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
+		{Name: "alpha", Paths: "alpha", OrgId: uuid.Must(uuid.FromString("33333333-3333-3333-3333-333333333333"))},
+        {Name: "bravo", Paths: "alpha.bravo", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
+        {Name: "charlie", Paths: "alpha.bravo.charlie", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
+        {Name: "delta", Paths: "alpha.delta", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
+        {Name: "echo", Paths: "alpha.delta.echo", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
+        {Name: "foxtrot", Paths: "foxtrot", OrgId: uuid.Must(uuid.FromString("22222222-2222-2222-2222-222222222222"))},
+        {Name: "golf", Paths: "golf", OrgId: uuid.Must(uuid.FromString("33333333-3333-3333-3333-333333333333"))},
+	}
 }
 
 func TestGetFoldersByOrgID(t *testing.T) {
 	
-
 	// Define test cases
 	tests := []struct {
 		name     string
@@ -37,16 +40,31 @@ func TestGetFoldersByOrgID(t *testing.T) {
 				{Name: "bravo", Paths: "alpha.bravo", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
 				{Name: "charlie", Paths: "alpha.bravo.charlie", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
 				{Name: "delta", Paths: "alpha.delta", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-				{Name: "echo", Paths: "echo", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
+				{Name: "echo", Paths: "alpha.delta.echo", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
+			},
+		},
+		{
+			name:  "Valid orgID with overlapping names",
+			orgID: uuid.Must(uuid.FromString("33333333-3333-3333-3333-333333333333")),
+			expected: []folder.Folder{
+				{Name: "alpha", Paths: "alpha", OrgId: uuid.Must(uuid.FromString("33333333-3333-3333-3333-333333333333"))},
+				{Name: "golf", Paths: "golf", OrgId: uuid.Must(uuid.FromString("33333333-3333-3333-3333-333333333333"))},
+			},
+		},
+		{
+			name:  "Valid orgID with only one folder",
+			orgID: uuid.Must(uuid.FromString("22222222-2222-2222-2222-222222222222")),
+			expected: []folder.Folder{
+				{Name: "foxtrot", Paths: "foxtrot", OrgId: uuid.Must(uuid.FromString("22222222-2222-2222-2222-222222222222"))},
 			},
 		},
 		{
 			name:     "Valid orgID with no folders",
-			orgID:    uuid.Must(uuid.FromString("33333333-3333-3333-3333-333333333333")),
+			orgID:    uuid.Must(uuid.FromString("22222222-1111-1111-1111-222222222222")),
 			expected: []folder.Folder{}, // Expect an empty slice
 		},
 		{
-			name:     "Invalid orgID (nil UUID)",
+			name:     "Invalid orgID",
 			orgID:    uuid.Nil,
 			expected: []folder.Folder{}, // Expect an empty slice
 		},
@@ -55,7 +73,7 @@ func TestGetFoldersByOrgID(t *testing.T) {
 	// Iterate through test cases
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			driver := folder.NewDriver(sampleFolders)
+			driver := folder.NewDriver(GetSampleFolders())
 			result := driver.GetFoldersByOrgID(tt.orgID)
 			assert.Equal(t, tt.expected, result)
 		})
@@ -65,12 +83,14 @@ func TestGetFoldersByOrgID(t *testing.T) {
 func TestGetAllChildFolders(t *testing.T) {
 	orgID, _ := uuid.FromString("11111111-1111-1111-1111-111111111111")
 
+	// Define test cases
 	tests := []struct {
 		name     string
 		rootName string
 		orgID    uuid.UUID
 		expected []folder.Folder
 		hasError bool
+		expectedErr string
 	}{
 		{
 			name:     "Get all child folders of 'alpha'",
@@ -80,15 +100,16 @@ func TestGetAllChildFolders(t *testing.T) {
 				{Name: "bravo", Paths: "alpha.bravo", OrgId: orgID},
 				{Name: "charlie", Paths: "alpha.bravo.charlie", OrgId: orgID},
 				{Name: "delta", Paths: "alpha.delta", OrgId: orgID},
+				{Name: "echo", Paths: "alpha.delta.echo", OrgId: orgID},
 			},
 			hasError: false,
 		},
 		{
-			name:     "Get all child folders of 'bravo'",
+			name:     "Get all child folders of 'delta'",
 			orgID:    orgID,
-			rootName: "bravo",
+			rootName: "delta",
 			expected: []folder.Folder{
-				{Name: "charlie", Paths: "alpha.bravo.charlie", OrgId: orgID},
+				{Name: "echo", Paths: "alpha.delta.echo", OrgId: orgID},
 			},
 			hasError: false,
 		},
@@ -100,11 +121,20 @@ func TestGetAllChildFolders(t *testing.T) {
 			hasError: false,
 		},
 		{
-			name:     "Root folder does not exist",
+			name:     "Invalid orgID",
+			orgID:    uuid.Must(uuid.FromString("11111111-3333-1111-1111-111111111111")),
+			rootName: "alpha",
+			expected: nil,
+			hasError: true,
+			expectedErr: "error: orgID does not contain any folders",
+		},
+		{
+			name:     "Folder does not exist",
 			orgID:    orgID,
 			rootName: "invalid_folder",
 			expected: nil,
 			hasError: true,
+			expectedErr: "error: Folder does not exist",
 		},
 		{
 			name:     "Root folder exists but belongs to a different organization",
@@ -112,15 +142,18 @@ func TestGetAllChildFolders(t *testing.T) {
 			rootName: "alpha",
 			expected: nil,
 			hasError: true,
+			expectedErr: "error: Folder does not exist in the specified organization",
 		},
 	}
 
+	// Iterate through test cases
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			driver := folder.NewDriver(sampleFolders)
+			driver := folder.NewDriver(GetSampleFolders())
 			result, error := driver.GetAllChildFolders(tt.orgID, tt.rootName)
 			if tt.hasError {
 				assert.Error(t, error)
+				assert.EqualError(t, error, tt.expectedErr)
 			} else {
 				assert.NoError(t, error)
 				assert.Equal(t, tt.expected, result)
@@ -128,29 +161,4 @@ func TestGetAllChildFolders(t *testing.T) {
 		})
 	}
 }
-
-
-
-
-
-
-// feel free to change how the unit test is structured
-// func Test_folder_GetFoldersByOrgID(t *testing.T) {
-// 	t.Parallel()
-// 	tests := [...]struct {
-// 		name    string
-// 		orgID   uuid.UUID
-// 		folders []folder.Folder
-// 		want    []folder.Folder
-// 	}{
-// 		// TODO: your tests here
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			// f := folder.NewDriver(tt.folders)
-// 			// get := f.GetFoldersByOrgID(tt.orgID)
-
-// 		})
-// 	}
-// }
 
