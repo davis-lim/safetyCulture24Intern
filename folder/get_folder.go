@@ -25,6 +25,7 @@ func (f *driver) GetFoldersByOrgID(orgID uuid.UUID) []Folder {
 
 }
 
+// Checks if a given orgID exists
 func (f *driver) OrgIdValid(orgID uuid.UUID) bool {
 	folders := f.folders
 	for _, folder := range folders {
@@ -36,7 +37,6 @@ func (f *driver) OrgIdValid(orgID uuid.UUID) bool {
 }
 
 func (f *driver) GetAllChildFolders(orgID uuid.UUID, name string) ([]Folder, error) {
-	// Your code here...
 
 	// Check for valid orgID
 	if !f.OrgIdValid(orgID) {

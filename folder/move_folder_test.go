@@ -10,20 +10,22 @@ import (
 
 // Returns Sample Folders
 func getMoveSampleFolders() []folder.Folder {
+	orgID1, _ := uuid.FromString("11111111-1111-1111-1111-111111111111")
+	orgID2, _ := uuid.FromString("22222222-2222-2222-2222-222222222222")
     return []folder.Folder{
-        {Name: "alpha", Paths: "alpha", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-        {Name: "bravo", Paths: "alpha.bravo", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-        {Name: "charlie", Paths: "alpha.bravo.charlie", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-        {Name: "delta", Paths: "alpha.delta", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-        {Name: "echo", Paths: "alpha.delta.echo", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-        {Name: "foxtrot", Paths: "alpha.delta.echo.foxtrot", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-        {Name: "golf", Paths: "golf", OrgId: uuid.Must(uuid.FromString("22222222-2222-2222-2222-222222222222"))},
+        {Name: "alpha", Paths: "alpha", OrgId: orgID1},
+        {Name: "bravo", Paths: "alpha.bravo", OrgId: orgID1},
+        {Name: "charlie", Paths: "alpha.bravo.charlie", OrgId: orgID1},
+        {Name: "delta", Paths: "alpha.delta", OrgId: orgID1},
+        {Name: "echo", Paths: "alpha.delta.echo", OrgId: orgID1},
+        {Name: "foxtrot", Paths: "alpha.delta.echo.foxtrot", OrgId: orgID1},
+        {Name: "golf", Paths: "golf", OrgId: orgID2},
     }
 }
 
 func Test_folder_MoveFolder(t *testing.T) {
-	// TODO: your tests here
-	
+	orgID1, _ := uuid.FromString("11111111-1111-1111-1111-111111111111")
+	orgID2, _ := uuid.FromString("22222222-2222-2222-2222-222222222222")
 
 	tests := []struct {
 		name        string
@@ -38,13 +40,13 @@ func Test_folder_MoveFolder(t *testing.T) {
 			src:  "bravo",
 			dst:  "delta",
 			expected: []folder.Folder{
-				{Name: "alpha", Paths: "alpha", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-				{Name: "bravo", Paths: "alpha.delta.bravo", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-				{Name: "charlie", Paths: "alpha.delta.bravo.charlie", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-				{Name: "delta", Paths: "alpha.delta", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-				{Name: "echo", Paths: "alpha.delta.echo", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-				{Name: "foxtrot", Paths: "alpha.delta.echo.foxtrot", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-				{Name: "golf", Paths: "golf", OrgId: uuid.Must(uuid.FromString("22222222-2222-2222-2222-222222222222"))},
+				{Name: "alpha", Paths: "alpha", OrgId: orgID1},
+				{Name: "bravo", Paths: "alpha.delta.bravo", OrgId: orgID1},
+				{Name: "charlie", Paths: "alpha.delta.bravo.charlie", OrgId: orgID1},
+				{Name: "delta", Paths: "alpha.delta", OrgId: orgID1},
+				{Name: "echo", Paths: "alpha.delta.echo", OrgId: orgID1},
+				{Name: "foxtrot", Paths: "alpha.delta.echo.foxtrot", OrgId: orgID1},
+				{Name: "golf", Paths: "golf", OrgId: orgID2},
 			},
 		},
 		{
@@ -52,13 +54,13 @@ func Test_folder_MoveFolder(t *testing.T) {
 			src:  "delta",
 			dst:  "bravo",
 			expected: []folder.Folder{
-				{Name: "alpha", Paths: "alpha", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-				{Name: "bravo", Paths: "alpha.bravo", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-				{Name: "charlie", Paths: "alpha.bravo.charlie", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-				{Name: "delta", Paths: "alpha.bravo.delta", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-				{Name: "echo", Paths: "alpha.bravo.delta.echo", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-				{Name: "foxtrot", Paths: "alpha.bravo.delta.echo.foxtrot", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-				{Name: "golf", Paths: "golf", OrgId: uuid.Must(uuid.FromString("22222222-2222-2222-2222-222222222222"))},
+				{Name: "alpha", Paths: "alpha", OrgId: orgID1},
+				{Name: "bravo", Paths: "alpha.bravo", OrgId: orgID1},
+				{Name: "charlie", Paths: "alpha.bravo.charlie", OrgId: orgID1},
+				{Name: "delta", Paths: "alpha.bravo.delta", OrgId: orgID1},
+				{Name: "echo", Paths: "alpha.bravo.delta.echo", OrgId: orgID1},
+				{Name: "foxtrot", Paths: "alpha.bravo.delta.echo.foxtrot", OrgId: orgID1},
+				{Name: "golf", Paths: "golf", OrgId: orgID2},
 			},
 		},
 		{

@@ -12,19 +12,25 @@ import (
 
 // Returns Sample Folders
 func GetSampleFolders() []folder.Folder {
+	orgID1, _ := uuid.FromString("11111111-1111-1111-1111-111111111111")
+	orgID2, _ := uuid.FromString("22222222-2222-2222-2222-222222222222")
+	orgID3, _ := uuid.FromString("33333333-3333-3333-3333-333333333333")
 	return []folder.Folder {
-		{Name: "alpha", Paths: "alpha", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-		{Name: "alpha", Paths: "alpha", OrgId: uuid.Must(uuid.FromString("33333333-3333-3333-3333-333333333333"))},
-        {Name: "bravo", Paths: "alpha.bravo", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-        {Name: "charlie", Paths: "alpha.bravo.charlie", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-        {Name: "delta", Paths: "alpha.delta", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-        {Name: "echo", Paths: "alpha.delta.echo", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-        {Name: "foxtrot", Paths: "foxtrot", OrgId: uuid.Must(uuid.FromString("22222222-2222-2222-2222-222222222222"))},
-        {Name: "golf", Paths: "golf", OrgId: uuid.Must(uuid.FromString("33333333-3333-3333-3333-333333333333"))},
+		{Name: "alpha", Paths: "alpha", OrgId: orgID1},
+		{Name: "alpha", Paths: "alpha", OrgId: orgID3},
+        {Name: "bravo", Paths: "alpha.bravo", OrgId: orgID1},
+        {Name: "charlie", Paths: "alpha.bravo.charlie", OrgId: orgID1},
+        {Name: "delta", Paths: "alpha.delta", OrgId: orgID1},
+        {Name: "echo", Paths: "alpha.delta.echo", OrgId: orgID1},
+        {Name: "foxtrot", Paths: "foxtrot", OrgId: orgID2},
+        {Name: "golf", Paths: "golf", OrgId: orgID3},
 	}
 }
 
 func TestGetFoldersByOrgID(t *testing.T) {
+	orgID1, _ := uuid.FromString("11111111-1111-1111-1111-111111111111")
+	orgID2, _ := uuid.FromString("22222222-2222-2222-2222-222222222222")
+	orgID3, _ := uuid.FromString("33333333-3333-3333-3333-333333333333")
 	
 	// Define test cases
 	tests := []struct {
@@ -34,28 +40,28 @@ func TestGetFoldersByOrgID(t *testing.T) {
 	}{
 		{
 			name:  "Valid orgID with folders",
-			orgID: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111")),
+			orgID: orgID1,
 			expected: []folder.Folder{
-				{Name: "alpha", Paths: "alpha", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-				{Name: "bravo", Paths: "alpha.bravo", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-				{Name: "charlie", Paths: "alpha.bravo.charlie", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-				{Name: "delta", Paths: "alpha.delta", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
-				{Name: "echo", Paths: "alpha.delta.echo", OrgId: uuid.Must(uuid.FromString("11111111-1111-1111-1111-111111111111"))},
+				{Name: "alpha", Paths: "alpha", OrgId: orgID1},
+				{Name: "bravo", Paths: "alpha.bravo", OrgId: orgID1},
+				{Name: "charlie", Paths: "alpha.bravo.charlie", OrgId: orgID1},
+				{Name: "delta", Paths: "alpha.delta", OrgId: orgID1},
+				{Name: "echo", Paths: "alpha.delta.echo", OrgId: orgID1},
 			},
 		},
 		{
 			name:  "Valid orgID with overlapping names",
-			orgID: uuid.Must(uuid.FromString("33333333-3333-3333-3333-333333333333")),
+			orgID: orgID3,
 			expected: []folder.Folder{
-				{Name: "alpha", Paths: "alpha", OrgId: uuid.Must(uuid.FromString("33333333-3333-3333-3333-333333333333"))},
-				{Name: "golf", Paths: "golf", OrgId: uuid.Must(uuid.FromString("33333333-3333-3333-3333-333333333333"))},
+				{Name: "alpha", Paths: "alpha", OrgId: orgID3},
+				{Name: "golf", Paths: "golf", OrgId: orgID3},
 			},
 		},
 		{
 			name:  "Valid orgID with only one folder",
-			orgID: uuid.Must(uuid.FromString("22222222-2222-2222-2222-222222222222")),
+			orgID: orgID2,
 			expected: []folder.Folder{
-				{Name: "foxtrot", Paths: "foxtrot", OrgId: uuid.Must(uuid.FromString("22222222-2222-2222-2222-222222222222"))},
+				{Name: "foxtrot", Paths: "foxtrot", OrgId: orgID2},
 			},
 		},
 		{
@@ -82,6 +88,7 @@ func TestGetFoldersByOrgID(t *testing.T) {
 
 func TestGetAllChildFolders(t *testing.T) {
 	orgID, _ := uuid.FromString("11111111-1111-1111-1111-111111111111")
+	orgID2, _ := uuid.FromString("22222222-2222-2222-2222-222222222222")
 
 	// Define test cases
 	tests := []struct {
@@ -138,7 +145,7 @@ func TestGetAllChildFolders(t *testing.T) {
 		},
 		{
 			name:     "Root folder exists but belongs to a different organization",
-			orgID:    uuid.Must(uuid.FromString("22222222-2222-2222-2222-222222222222")),
+			orgID:    orgID2,
 			rootName: "alpha",
 			expected: nil,
 			hasError: true,

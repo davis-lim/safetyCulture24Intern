@@ -7,7 +7,6 @@ import (
 )
 
 func (f *driver) MoveFolder(name string, dst string) ([]Folder, error) {
-	// Your code here...
 	var src, dest *Folder
 
 	// Find the src and dest folders
